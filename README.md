@@ -39,7 +39,7 @@ The Tests extract the access token and stores it in the environment variable nam
 
 The Authorization is set to Bearer Token and Token is assigned from the environment variable access_token.
 
-The Body defines a JSON documents for the call.
+The Body defines a JSON document for the call.
 
 The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
 
