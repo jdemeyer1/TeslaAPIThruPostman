@@ -1,21 +1,31 @@
 # Using the Tesla API with Postman
 
 ## Authentcation
-The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.
+The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.
 
 ### Step 1: Request Log In Page
 
-USER PREPARATION: Enter the email address used to access your Telsa account in the parameter named login_hint.  Save this change before clicking Send.
+USER PREPARATION: Enter the email address used to access your Telsa account in the parameter named login_hint.  Enter a random string in the parameter named state.  Save these changes before clicking Send.
 
 #### Documentation
 
-All parameters have been defined.  Update the login_hint as described in USER PREPARATION.
+All parameters have been defined.  Update the state and login_hint as described in USER PREPARATION.
 
 The Pre-request Script creates the code verifier and code challenge required for the API calls.
 
 The Tests extract hidden form variables from the response and store them in the envrionment for subsequent calls.
 
 ### Step 2: Obtain Authorization Code
+
+USER PREPARATION: Enter a random string in the parameter named state.  This should be the same value used in the Request Log In Page call.  On the Body tab, enter your Tesla Log In ID for the identity key, and enter your Tesla Log In password for the credential key.   Save these changes before clicking Send.
+
+#### Documentation
+
+All parameters have been defined.  Update the state parameter and Body keys as described in USER PREPARATION.
+
+The Body defines form variables sent with the call.  Some form variables are assigned from environment variables; the credentials are updated as described in USER PREPARATION.
+
+The Tests extract an authentication code and stores it in the environment variable named code.
 
 ### Step 3: Exchange Authentication Code for Bearer Token
 
@@ -33,7 +43,9 @@ The Get Vehicles call retrieves a list of vehicles on your Tesla account.  It ex
 
 ### Wake Vehicle
 
-The Wake Vehicle call wakes a sleeping vehicle.
+The Wake Vehicle call wakes a sleeping vehicle.  A vehicle must be online to respond to requests for vehicle information.
+
+The Tests contains a check named Vehicle On-Line Check.  If the test passes, the vehicle is online.
 
 ### Get Vehicle Data
 
