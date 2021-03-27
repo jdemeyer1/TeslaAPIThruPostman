@@ -1,7 +1,7 @@
 # Using the Tesla API with Postman
 
 ## Authentcation
-The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.
+The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.  Note that some authentication information is time sensitive so the steps should be completed in a five minute period.
 
 ### Step 1: Request Log In Page
 
@@ -29,7 +29,22 @@ The Tests extract an authentication code and stores it in the environment variab
 
 ### Step 3: Exchange Authentication Code for Bearer Token
 
+#### Documentation
+
+The Body defines a JSON document containing the authentication code received in step 2 and the code verifier created in step 1.
+
+The Tests extract the access token and stores it in the environment variable named access_token.
+
 ### Step 4: Exchange Bearer Token for Access Token
+
+The Authorization is set to Bearer Token and Token is assigned from the environment variable access_token.
+
+The Body defines a JSON documents for the call.
+
+The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
+
+The Console indicates success or failure.
+
 
 ## Using the APIs
 
