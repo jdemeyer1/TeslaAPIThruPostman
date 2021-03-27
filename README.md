@@ -1,7 +1,7 @@
 # Using the Tesla API with Postman
 
 ## Authentcation
-The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with Postman is recommended.
+The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.
 
 ### Step 1: Request Log In Page
 
