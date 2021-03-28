@@ -43,8 +43,6 @@ The Body defines a JSON document for the call.
 
 The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
 
-The Console indicates success or failure.
-
 
 ## Using the APIs
 
