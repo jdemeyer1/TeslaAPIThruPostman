@@ -13,19 +13,19 @@ All parameters have been defined.  Update the state and login_hint as described 
 
 The Pre-request Script creates the code verifier and code challenge required for the API calls.
 
-The Tests extract hidden form variables from the response and store them in the envrionment for subsequent calls.
+The Tests extract hidden form variables from the response and store them in envrionment variables for subsequent calls.
 
 ### Step 2: Obtain Authorization Code
 
-USER PREPARATION: Enter a random string in the parameter named state.  This should be the same value used in the Request Log In Page call.  On the Body tab, enter your Tesla Log In ID for the identity key, and enter your Tesla Log In password for the credential key.   Save these changes before clicking Send.
+USER PREPARATION: Enter a random string in the parameter named state.  This should be the same value used in the Request Log In Page call (step 1).  On the Body tab, enter your Tesla Log In ID for the identity key, and enter your Tesla Log In password for the credential key.   Save these changes before clicking Send.
 
 #### Documentation
 
 All parameters have been defined.  Update the state parameter and Body keys as described in USER PREPARATION.
 
-The Body defines form variables sent with the call.  Some form variables are assigned from environment variables; the credentials are updated as described in USER PREPARATION.
+The Body defines form variables sent with the call.  Some form variables are assigned from environment variables; the Tesla Log In credentials are updated as described in USER PREPARATION.
 
-The Tests extract an authentication code and stores it in the environment variable named code.
+The Tests extract an authentication code and store it in the environment variable named code.
 
 ### Step 3: Exchange Authentication Code for Bearer Token
 
@@ -33,7 +33,7 @@ The Tests extract an authentication code and stores it in the environment variab
 
 The Body defines a JSON document containing the authentication code received in step 2 and the code verifier created in step 1.
 
-The Tests extract the access token and stores it in the environment variable named access_token.
+The Tests extract the access token and store it in the environment variable named access_token.
 
 ### Step 4: Exchange Bearer Token for Access Token
 
