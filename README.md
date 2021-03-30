@@ -3,6 +3,8 @@
 ## Authentcation
 **PLEASE READ STEPS DOCUMENTATION BEFORE ATTEMPTING AUTHENTICATION.**  The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.  Note that some authentication information is time sensitive so the steps should be completed in a five minute period.
 
+### There is no support for MFA at this time.  Step 3 will fail without MFA support.
+
 ### Step 1: Request Log In Page
 
 USER PREPARATION: Enter the email address used to access your Telsa account in the parameter named login_hint.  Enter a random string in the parameter named state.  Save these changes before clicking Send.
