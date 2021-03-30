@@ -37,9 +37,13 @@ The Tests extract the access token and store it in the environment variable name
 
 ### Step 4: Exchange Bearer Token for Access Token
 
+USER PREPARATION: Enter the client ID and secret before clicking Send. The current client ID and secret are [available here](https://pastebin.com/pS7Z6yyP).
+
+#### Documentation
+
 The Authorization is set to Bearer Token and Token is assigned from the environment variable access_token.
 
-The Body defines a JSON document for the call.
+The Body defines a JSON document for the call.  Update the client ID and secret as described in USER PREPARATION.
 
 The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
 
