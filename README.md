@@ -1,7 +1,7 @@
 # Using the Tesla API with Postman
 
 ## Authentcation
-The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.  Note that some authentication information is time sensitive so the steps should be completed in a five minute period.
+**PLEASE READ STEPS DOCUMENTATION BEFORE ATTEMPTING AUTHENTICATION.**  The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.  Note that some authentication information is time sensitive so the steps should be completed in a five minute period.
 
 ### Step 1: Request Log In Page
 
