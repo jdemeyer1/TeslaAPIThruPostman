@@ -1,0 +1,609 @@
+{
+	"info": {
+		"_postman_id": "cb8af463-690b-4349-9706-2ca779846576",
+		"name": "Tesla API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Vehicles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"var vehicleIdS = jsonData.response[0].id_s;\r",
+							"//set environment variable for use in all other APIs  \r",
+							"pm.environment.set(\"teslaVehicleIdS\", vehicleIdS);\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{teslaBearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{endPoint}}api/1/vehicles",
+					"host": [
+						"{{endPoint}}api"
+					],
+					"path": [
+						"1",
+						"vehicles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Vehicle State",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{teslaBearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{teslaBearerToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{endPoint}}api/1/vehicles/{{teslaVehicleIdS}}/data_request/vehicle_state",
+					"host": [
+						"{{endPoint}}api"
+					],
+					"path": [
+						"1",
+						"vehicles",
+						"{{teslaVehicleIdS}}",
+						"data_request",
+						"vehicle_state"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wake Vehicle",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"    pm.test(\"Vehicle On-Line Check\", function () {\r",
+							"        var jsonData = pm.response.json();\r",
+							"        pm.expect(jsonData.response.state).to.eql('online');\r",
+							"    });\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{teslaBearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{endPoint}}/api/1/vehicles/{{teslaVehicleIdS}}/wake_up",
+					"host": [
+						"{{endPoint}}"
+					],
+					"path": [
+						"api",
+						"1",
+						"vehicles",
+						"{{teslaVehicleIdS}}",
+						"wake_up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Vehicle Data",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{teslaBearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{endPoint}}/api/1/vehicles/{{teslaVehicleIdS}}/vehicle_data",
+					"host": [
+						"{{endPoint}}"
+					],
+					"path": [
+						"api",
+						"1",
+						"vehicles",
+						"{{teslaVehicleIdS}}",
+						"vehicle_data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Mobile State",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{teslaBearerToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://owner-api.teslamotors.com/api/1/vehicles/{{teslaVehicleIdS}}/mobile_enabled",
+					"protocol": "https",
+					"host": [
+						"owner-api",
+						"teslamotors",
+						"com"
+					],
+					"path": [
+						"api",
+						"1",
+						"vehicles",
+						"{{teslaVehicleIdS}}",
+						"mobile_enabled"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Log In Page",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const $ = cheerio.load(responseBody);\r",
+							"\r",
+							"//extract hidden variables for use in Obtain Authorization Code (step 2) form submission \r",
+							"pm.environment.set(\"_csrf\",$( \"input[name='_csrf']\" ).val());\r",
+							"pm.environment.set(\"_phase\",$( \"input[name='_phase']\" ).val());\r",
+							"pm.environment.set(\"_process\",$( \"input[name='_process']\" ).val());\r",
+							"pm.environment.set(\"transaction_id\",$( \"input[name='transaction_id']\" ).val());\r",
+							"pm.environment.set(\"cancel\",$( \"input[name='cancel']\" ).val());\r",
+							"//extract session id from header\r",
+							"pm.environment.set(\"Cookie\", postman.getResponseCookie(\"tesla-auth.sid\").value);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"var c_v;\r",
+							"var c_c;\r",
+							"\r",
+							"function generateString(length) {\r",
+							"    let result = '';\r",
+							"    const charactersLength = characters.length;\r",
+							"    for ( let i = 0; i < length; i++ ) {\r",
+							"        result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
+							"    }\r",
+							"\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"//generate code verifier and code challenge\r",
+							"c_v = generateString(86);\r",
+							"c_c = CryptoJS.SHA256(c_v).toString();\r",
+							"\r",
+							"//set environment variables\r",
+							"pm.environment.set(\"code_verifier\", c_v);\r",
+							"pm.environment.set(\"code_challenge\",c_c);\r",
+							"\r",
+							"//console.log(\"c_v: \" + c_v + \", c_c: \" + c_c);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{tokenEndPoint}}authorize?client_id=ownerapi&code_challenge={{code_challenge}}&code_challenge_method=S256&redirect_uri=https://auth.tesla.com/void/callback&response_type=code&scope=openid email offline_access&state=123&login_hint=youremailgoes@here.com",
+					"host": [
+						"{{tokenEndPoint}}authorize"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "ownerapi",
+							"description": "Always: ownerapi"
+						},
+						{
+							"key": "code_challenge",
+							"value": "{{code_challenge}}",
+							"description": "See Pre-request Script"
+						},
+						{
+							"key": "code_challenge_method",
+							"value": "S256",
+							"description": "Always: S256"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://auth.tesla.com/void/callback",
+							"description": "Always: https://auth.tesla.com/void/callback"
+						},
+						{
+							"key": "response_type",
+							"value": "code",
+							"description": "Always: code"
+						},
+						{
+							"key": "scope",
+							"value": "openid email offline_access",
+							"description": "Always: openid email offline_access"
+						},
+						{
+							"key": "state",
+							"value": "123",
+							"description": "Any random string"
+						},
+						{
+							"key": "login_hint",
+							"value": "youremailgoes@here.com",
+							"description": "Usually the email address used for your Tesla account"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtain Authorization Code",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//extract authentication code from referer URL\r",
+							"refererURL = request.headers[\"referer\"];\r",
+							"params = refererURL.split('?')[1];\r",
+							"eachParam = params.split('&');\r",
+							"authCode = eachParam[0].split('=')[1];\r",
+							"//set environment variable for use in step 3\r",
+							"pm.environment.set(\"code\", authCode);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{Cookie}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "identity",
+							"value": "youremailgoes@here.com",
+							"description": "Tesla Log In ID",
+							"type": "text"
+						},
+						{
+							"key": "credential",
+							"value": "your Tesla password",
+							"description": "Tesla Log In password",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{_csrf}}",
+							"description": "Hidden input variable captured in step 1",
+							"type": "text"
+						},
+						{
+							"key": "_phase",
+							"value": "{{_phase}}",
+							"description": "Hidden input variable captured in step 1",
+							"type": "text"
+						},
+						{
+							"key": "_process",
+							"value": "{{_process}}",
+							"description": "Hidden input variable captured in step 1",
+							"type": "text"
+						},
+						{
+							"key": "transaction_id",
+							"value": "{{transaction_id}}",
+							"description": "Hidden input variable captured in step 1",
+							"type": "text"
+						},
+						{
+							"key": "cancel",
+							"value": "{{cancel}}",
+							"description": "Hidden input variable captured in step 1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{tokenEndPoint}}authorize?client_id=ownerapi&code_challenge={{code_challenge}}&code_challenge_method=S256&redirect_uri=https://auth.tesla.com/void/callback&response_type=code&scope=openid email offline_access&state=123",
+					"host": [
+						"{{tokenEndPoint}}authorize"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "ownerapi",
+							"description": "Always: ownerapi"
+						},
+						{
+							"key": "code_challenge",
+							"value": "{{code_challenge}}",
+							"description": "See Pre-request Script in step 1"
+						},
+						{
+							"key": "code_challenge_method",
+							"value": "S256",
+							"description": "Always: S256"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://auth.tesla.com/void/callback",
+							"description": "Always: https://auth.tesla.com/void/callback"
+						},
+						{
+							"key": "response_type",
+							"value": "code",
+							"description": "Always: code"
+						},
+						{
+							"key": "scope",
+							"value": "openid email offline_access",
+							"description": "Always: openid email offline_access"
+						},
+						{
+							"key": "state",
+							"value": "123",
+							"description": "Any random string"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exchange Authentication Code for Bearer Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"//extract access_token for use in step 4\r",
+							"pm.environment.set(\"access_token\", jsonData.access_token);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"grant_type\": \"authorization_code\",\r\n  \"client_id\": \"ownerapi\",\r\n  \"code\": \"{{code}}\",\r\n  \"code_verifier\": \"{{code_verifier}}\",\r\n  \"redirect_uri\": \"https://auth.tesla.com/void/callback\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{tokenEndPoint}}token",
+					"host": [
+						"{{tokenEndPoint}}token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Exchange Bearer Token for Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"//extract bearer and refresh tokens\r",
+							"// bearer token: for use in API calls such as Wake Vehicle and Get Vehicle Data; valid for 45 days\r",
+							"// refresh token: refresh bearer token after 45 days\r",
+							"pm.environment.set(\"teslaBearerToken\", jsonData.access_token);\r",
+							"pm.environment.set(\"teslaRefreshToken\", jsonData.refresh_token);\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+							"description": "Always: urn:ietf:params:oauth:grant-type:jwt-bearer",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "client_id goes here",
+							"description": "Tesla client_id",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "client_secret goes here",
+							"description": "Tesla client_secret",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endPoint}}oauth/token",
+					"host": [
+						"{{endPoint}}oauth"
+					],
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"//extract bearer and refresh tokens\r",
+							"// bearer token: for use in API calls such as Wake Vehicle and Get Vehicle Data; valid for 45 days\r",
+							"// refresh token: refresh bearer token after 45 days\r",
+							"pm.environment.set(\"teslaBearerToken\", jsonData.access_token);\r",
+							"pm.environment.set(\"teslaRefreshToken\", jsonData.refresh_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "refresh_token",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "ownerapi",
+							"type": "text"
+						},
+						{
+							"key": "refresh_token",
+							"value": "{{refresh_token}}",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "openid email offline_access",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{tokenEndPoint}}token",
+					"host": [
+						"{{tokenEndPoint}}token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
