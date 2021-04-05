@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "cb8af463-690b-4349-9706-2ca779846576",
+		"_postman_id": "ff60a7e2-d97b-4b18-a589-b0af9239765d",
 		"name": "Tesla API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -600,6 +600,116 @@
 					"raw": "{{tokenEndPoint}}token",
 					"host": [
 						"{{tokenEndPoint}}token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Access Token with MFA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//extract bearer and refresh tokens\r",
+							"// bearer token: for use in API calls such as Wake Vehicle and Get Vehicle Data; valid for 45 days\r",
+							"// refresh token: this is useless with the current OAuth implementation\r",
+							"\r",
+							"if(responseCode.code == 200)\r",
+							"{\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"teslaBearerToken\", jsonData.access_token);\r",
+							"    pm.environment.set(\"teslaRefreshToken\", jsonData.refresh_token);\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "state",
+							"value": "EnterRandomCharactersHere",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ownerapi",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://auth.tesla.com/oauth2/v3/token",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "https://auth.tesla.com/oauth2/v3/authorize",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "Tesla Owners API Token",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "openid email offline_access",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://auth.tesla.com/void/callback",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code_with_pkce",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"grant_type\": \"urn:ietf:params:oauth:grant-type:jwt-bearer\",\r\n    \"client_id\": \"{{clientid}}\",\r\n    \"client_secret\": \"{{clientsecret}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://owner-api.teslamotors.com/oauth/token",
+					"protocol": "https",
+					"host": [
+						"owner-api",
+						"teslamotors",
+						"com"
+					],
+					"path": [
+						"oauth",
+						"token"
 					]
 				}
 			},

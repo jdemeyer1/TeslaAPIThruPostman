@@ -1,9 +1,13 @@
 # Using the Tesla API with Postman
 
-## Authentcation
-**PLEASE READ STEPS DOCUMENTATION BEFORE ATTEMPTING AUTHENTICATION.**  The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended.  Execute steps 1 to 4 to receive an access token that can be used with API calls.  Note that some authentication information is time sensitive so the steps should be completed in a five minute period.
+**PLEASE READ STEPS DOCUMENTATION BEFORE ATTEMPTING AUTHENTICATION.**  The authentication sequence follows the sequence outlined [here](https://tesla-api.timdorr.com/api-basics/authentication).  Familarity with [Postman](https://www.postman.com/) is recommended. You must obtain an access token through one of two methods.
 
-### There is no support for MFA at this time.  Step 3 will fail without MFA support.
+1. Use Authentication (Without MFA) if your account does not have MFA enabled, and to observe each authentication step directly.
+2. Use Authentcation (With or Without MFA) if your account has MFA enabled, or if you do not want to store your account credentials in Postman. This process will use a browser based session on Tesla's website to generate the access token.
+
+Note that some authentication information is time sensitive so the steps should be completed in a five minute period.
+## Authentcation (Without MFA)
+### Step 3 will fail without MFA support. If your account has MFA enabled, skip to 
 
 ### Step 1: Request Log In Page
 
@@ -49,6 +53,37 @@ The Body defines a JSON document for the call.  Update the client ID and secret 
 
 The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
 
+## Authentcation (With or Without MFA)
+### Step 1: Setup Environment
+
+USER PREPARATION: Obtain the Client_ID and Client_Secret for the Telsa Owners API which can be found [here](https://www.teslaapi.io/authentication/oauth).
+
+#### Documentation
+
+Open the environment variables in Postman and updated the current value for clientid and clientsecret with the values obtained in the User Preparation section. Save and close environment variables.
+
+Open the Get Access Token with MFA request. Click on the Authorization tab. Update the State variable with a random string of characters.
+
+### Step 2: Obtain Authorization Token from the Tesla SSO server
+
+NOTE: The token will expire after 5 minutes. If you do not perform step 3 in that time frame you will be required to repeat this step.
+
+#### Documentation
+
+In the Get Access Token with MFA request, under the Authorization tab, scroll down to the bottom and click Get New Access Token.
+
+A new browser based window will open to the Tesla SSO website. Enter your Tesla credentials and satisfy MFA if you have it enabled on your account.
+
+The window will automatically close, and Postman will display the authorization token it received. Click on Use Token.
+
+### Step 3: Exchange Authorization Token for Access Token
+#### Documentation
+
+In the Get Access Token with MFA request, click on Send.
+
+The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
+
+NOTE: This refresh token cannot be used to refresh your access token. You must repeate Step 2 to obtain a new Authorization token, then repeat this step to obtain a new token.
 
 ## Using the APIs
 
