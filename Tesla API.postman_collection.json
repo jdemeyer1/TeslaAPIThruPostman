@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ff60a7e2-d97b-4b18-a589-b0af9239765d",
+		"_postman_id": "3fed727b-f1c0-4535-9e90-8cc308c00f59",
 		"name": "Tesla API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -521,13 +521,13 @@
 						},
 						{
 							"key": "client_id",
-							"value": "client_id goes here",
+							"value": "{{clientid}}",
 							"description": "Tesla client_id",
 							"type": "text"
 						},
 						{
 							"key": "client_secret",
-							"value": "client_secret goes here",
+							"value": "{{clientsecret}}",
 							"description": "Tesla client_secret",
 							"type": "text"
 						}
