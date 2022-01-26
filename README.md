@@ -53,7 +53,7 @@ The Body defines a JSON document for the call.  Update the client ID and secret 
 
 The Tests extract access and refresh tokens.  The access token is stored in the environment variable named teslaBearerToken.  The refresh token is stored in the environment variable named teslaRefreshToken.
 
-## Authentcation (With or Without MFA)
+## Authentication (With or Without MFA)
 ### Step 1: Setup Environment
 
 USER PREPARATION: Obtain the Client_ID and Client_Secret for the Telsa Owners API which can be found [here](https://www.teslaapi.io/authentication/oauth).
