@@ -1,88 +1,109 @@
 {
 	"info": {
-		"_postman_id": "3fed727b-f1c0-4535-9e90-8cc308c00f59",
+		"_postman_id": "57f08d62-cfa1-4ae3-90a2-047b65328dda",
 		"name": "Tesla API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Get Vehicles",
+			"name": "Request Tesla Access Token",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"var jsonData = pm.response.json();\r",
-							"var vehicleIdS = jsonData.response[0].id_s;\r",
-							"//set environment variable for use in all other APIs  \r",
-							"pm.environment.set(\"teslaVehicleIdS\", vehicleIdS);\r",
-							"\r",
-							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
 							""
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
+					"type": "oauth2",
+					"oauth2": [
 						{
-							"key": "token",
-							"value": "{{teslaBearerToken}}",
+							"key": "state",
+							"value": "{{requestState}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenName",
+							"value": "teslaToken_{{$isoTimestamp}}",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "ownerapi",
+							"type": "string"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code_with_pkce",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "body",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "{{tokenEndPoint}}token",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "{{tokenEndPoint}}authorize",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "{{clientsecret}}",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "openid email offline_access",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://auth.tesla.com/void/callback",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
 							"type": "string"
 						}
 					]
 				},
 				"method": "GET",
 				"header": [],
-				"url": {
-					"raw": "{{endPoint}}api/1/vehicles",
-					"host": [
-						"{{endPoint}}api"
-					],
-					"path": [
-						"1",
-						"vehicles"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Vehicle State",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{teslaBearerToken}}",
-							"type": "string"
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
 						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{teslaBearerToken}}",
-						"type": "text"
 					}
-				],
+				},
 				"url": {
-					"raw": "{{endPoint}}api/1/vehicles/{{teslaVehicleIdS}}/data_request/vehicle_state",
-					"host": [
-						"{{endPoint}}api"
-					],
-					"path": [
-						"1",
-						"vehicles",
-						"{{teslaVehicleIdS}}",
-						"data_request",
-						"vehicle_state"
-					]
+					"raw": ""
 				}
 			},
 			"response": []
@@ -94,24 +115,48 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"    var isValid = true;\r",
+							"    var todaysDate = new Date();\r",
+							"\r",
 							"    pm.test(\"Vehicle On-Line Check\", function () {\r",
 							"        var jsonData = pm.response.json();\r",
 							"        pm.expect(jsonData.response.state).to.eql('online');\r",
 							"    });\r",
 							"\r",
+							"    pm.test(\"Valid Token Check\", function () {\r",
+							"        if (todaysDate.getTime() > pm.environment.get(\"tokenValidUntil\")) {\r",
+							"            console.log(\"Token has expired.\");\r",
+							"            isValid = false;\r",
+							"        }\r",
+							"        else {\r",
+							"            console.log(\"Token valid until: \" + pm.environment.get(\"readableValidUntilDate\"));\r",
+							"        }\r",
+							"        pm.expect(isValid).to.eql(true);\r",
+							"    });"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
 							""
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
 			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
 						{
 							"key": "token",
-							"value": "{{teslaBearerToken}}",
+							"value": "{{access_token}}",
 							"type": "string"
 						}
 					]
@@ -136,13 +181,55 @@
 		},
 		{
 			"name": "Get Vehicle Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var isValid = true;\r",
+							"var todaysDate = new Date();\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"if (jsonData.response.charge_state.charging_state == \"Complete\" || jsonData.response.charge_state.charging_state == \"Stopped\")  {\r",
+							"    console.log(\"Charing State: \" + jsonData.response.charge_state.charging_state + \", \" + \"Charge Data: \" + jsonData.response.charge_state.charge_energy_added + \", Odometer: \" + jsonData.response.vehicle_state.odometer + \", battery range: \" + jsonData.response.charge_state.battery_range + \", estimated range: \" + jsonData.response.charge_state.est_battery_range + \", ideal range: \" + jsonData.response.charge_state.ideal_battery_range + \", outside temp: \" + jsonData.response.climate_state.outside_temp);\r",
+							"} else {\r",
+							"    console.log(\"Still charging. Time to full charge: \" + jsonData.response.charge_state.time_to_full_charge);\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Valid Token Check\", function () {\r",
+							"        if (todaysDate.getTime() > pm.environment.get(\"tokenValidUntil\")) {\r",
+							"            console.log(\"Token has expired.\");\r",
+							"            isValid = false;\r",
+							"        }\r",
+							"        else {\r",
+							"            console.log(\"Token valid until: \" + pm.environment.get(\"readableValidUntilDate\"));\r",
+							"        }\r",
+							"        pm.expect(isValid).to.eql(true);\r",
+							"    });\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
 						{
 							"key": "token",
-							"value": "{{teslaBearerToken}}",
+							"value": "{{access_token}}",
 							"type": "string"
 						}
 					]
@@ -166,329 +253,30 @@
 			"response": []
 		},
 		{
-			"name": "Get Mobile State",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{teslaBearerToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://owner-api.teslamotors.com/api/1/vehicles/{{teslaVehicleIdS}}/mobile_enabled",
-					"protocol": "https",
-					"host": [
-						"owner-api",
-						"teslamotors",
-						"com"
-					],
-					"path": [
-						"api",
-						"1",
-						"vehicles",
-						"{{teslaVehicleIdS}}",
-						"mobile_enabled"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Request Log In Page",
+			"name": "Get Vehicles",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"const $ = cheerio.load(responseBody);\r",
+							"var isValid = true;\r",
+							"var todaysDate = new Date();\r",
 							"\r",
-							"//extract hidden variables for use in Obtain Authorization Code (step 2) form submission \r",
-							"pm.environment.set(\"_csrf\",$( \"input[name='_csrf']\" ).val());\r",
-							"pm.environment.set(\"_phase\",$( \"input[name='_phase']\" ).val());\r",
-							"pm.environment.set(\"_process\",$( \"input[name='_process']\" ).val());\r",
-							"pm.environment.set(\"transaction_id\",$( \"input[name='transaction_id']\" ).val());\r",
-							"pm.environment.set(\"cancel\",$( \"input[name='cancel']\" ).val());\r",
-							"//extract session id from header\r",
-							"pm.environment.set(\"Cookie\", postman.getResponseCookie(\"tesla-auth.sid\").value);\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
-							"var c_v;\r",
-							"var c_c;\r",
-							"\r",
-							"function generateString(length) {\r",
-							"    let result = '';\r",
-							"    const charactersLength = characters.length;\r",
-							"    for ( let i = 0; i < length; i++ ) {\r",
-							"        result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
-							"    }\r",
-							"\r",
-							"    return result;\r",
-							"}\r",
-							"\r",
-							"//generate code verifier and code challenge\r",
-							"c_v = generateString(86);\r",
-							"c_c = CryptoJS.SHA256(c_v).toString();\r",
-							"\r",
-							"//set environment variables\r",
-							"pm.environment.set(\"code_verifier\", c_v);\r",
-							"pm.environment.set(\"code_challenge\",c_c);\r",
-							"\r",
-							"//console.log(\"c_v: \" + c_v + \", c_c: \" + c_c);\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{tokenEndPoint}}authorize?client_id=ownerapi&code_challenge={{code_challenge}}&code_challenge_method=S256&redirect_uri=https://auth.tesla.com/void/callback&response_type=code&scope=openid email offline_access&state=123&login_hint=youremailgoes@here.com",
-					"host": [
-						"{{tokenEndPoint}}authorize"
-					],
-					"query": [
-						{
-							"key": "client_id",
-							"value": "ownerapi",
-							"description": "Always: ownerapi"
-						},
-						{
-							"key": "code_challenge",
-							"value": "{{code_challenge}}",
-							"description": "See Pre-request Script"
-						},
-						{
-							"key": "code_challenge_method",
-							"value": "S256",
-							"description": "Always: S256"
-						},
-						{
-							"key": "redirect_uri",
-							"value": "https://auth.tesla.com/void/callback",
-							"description": "Always: https://auth.tesla.com/void/callback"
-						},
-						{
-							"key": "response_type",
-							"value": "code",
-							"description": "Always: code"
-						},
-						{
-							"key": "scope",
-							"value": "openid email offline_access",
-							"description": "Always: openid email offline_access"
-						},
-						{
-							"key": "state",
-							"value": "123",
-							"description": "Any random string"
-						},
-						{
-							"key": "login_hint",
-							"value": "youremailgoes@here.com",
-							"description": "Usually the email address used for your Tesla account"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Obtain Authorization Code",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"//extract authentication code from referer URL\r",
-							"refererURL = request.headers[\"referer\"];\r",
-							"params = refererURL.split('?')[1];\r",
-							"eachParam = params.split('&');\r",
-							"authCode = eachParam[0].split('=')[1];\r",
-							"//set environment variable for use in step 3\r",
-							"pm.environment.set(\"code\", authCode);\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Cookie",
-						"value": "{{Cookie}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "identity",
-							"value": "youremailgoes@here.com",
-							"description": "Tesla Log In ID",
-							"type": "text"
-						},
-						{
-							"key": "credential",
-							"value": "your Tesla password",
-							"description": "Tesla Log In password",
-							"type": "text"
-						},
-						{
-							"key": "_csrf",
-							"value": "{{_csrf}}",
-							"description": "Hidden input variable captured in step 1",
-							"type": "text"
-						},
-						{
-							"key": "_phase",
-							"value": "{{_phase}}",
-							"description": "Hidden input variable captured in step 1",
-							"type": "text"
-						},
-						{
-							"key": "_process",
-							"value": "{{_process}}",
-							"description": "Hidden input variable captured in step 1",
-							"type": "text"
-						},
-						{
-							"key": "transaction_id",
-							"value": "{{transaction_id}}",
-							"description": "Hidden input variable captured in step 1",
-							"type": "text"
-						},
-						{
-							"key": "cancel",
-							"value": "{{cancel}}",
-							"description": "Hidden input variable captured in step 1",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{tokenEndPoint}}authorize?client_id=ownerapi&code_challenge={{code_challenge}}&code_challenge_method=S256&redirect_uri=https://auth.tesla.com/void/callback&response_type=code&scope=openid email offline_access&state=123",
-					"host": [
-						"{{tokenEndPoint}}authorize"
-					],
-					"query": [
-						{
-							"key": "client_id",
-							"value": "ownerapi",
-							"description": "Always: ownerapi"
-						},
-						{
-							"key": "code_challenge",
-							"value": "{{code_challenge}}",
-							"description": "See Pre-request Script in step 1"
-						},
-						{
-							"key": "code_challenge_method",
-							"value": "S256",
-							"description": "Always: S256"
-						},
-						{
-							"key": "redirect_uri",
-							"value": "https://auth.tesla.com/void/callback",
-							"description": "Always: https://auth.tesla.com/void/callback"
-						},
-						{
-							"key": "response_type",
-							"value": "code",
-							"description": "Always: code"
-						},
-						{
-							"key": "scope",
-							"value": "openid email offline_access",
-							"description": "Always: openid email offline_access"
-						},
-						{
-							"key": "state",
-							"value": "123",
-							"description": "Any random string"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Exchange Authentication Code for Bearer Token",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
 							"var jsonData = pm.response.json();\r",
-							"//extract access_token for use in step 4\r",
-							"pm.environment.set(\"access_token\", jsonData.access_token);\r",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"grant_type\": \"authorization_code\",\r\n  \"client_id\": \"ownerapi\",\r\n  \"code\": \"{{code}}\",\r\n  \"code_verifier\": \"{{code_verifier}}\",\r\n  \"redirect_uri\": \"https://auth.tesla.com/void/callback\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{tokenEndPoint}}token",
-					"host": [
-						"{{tokenEndPoint}}token"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Exchange Bearer Token for Access Token",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();\r",
-							"//extract bearer and refresh tokens\r",
-							"// bearer token: for use in API calls such as Wake Vehicle and Get Vehicle Data; valid for 45 days\r",
-							"// refresh token: refresh bearer token after 45 days\r",
-							"pm.environment.set(\"teslaBearerToken\", jsonData.access_token);\r",
-							"pm.environment.set(\"teslaRefreshToken\", jsonData.refresh_token);\r",
+							"var vehicleIdS = jsonData.response[0].id_s;\r",
+							"//set environment variable for use in all other APIs  \r",
+							"pm.environment.set(\"teslaVehicleIdS\", vehicleIdS);\r",
+							"\r",
+							"pm.test(\"Valid Token Check\", function () {\r",
+							"        if (todaysDate.getTime() > pm.environment.get(\"tokenValidUntil\")) {\r",
+							"            console.log(\"Token has expired.\");\r",
+							"            isValid = false;\r",
+							"        }\r",
+							"        else {\r",
+							"            console.log(\"Token valid until: \" + pm.environment.get(\"readableValidUntilDate\"));\r",
+							"        }\r",
+							"        pm.expect(isValid).to.eql(true);\r",
+							"    });\r",
 							"\r",
 							"\r",
 							""
@@ -508,120 +296,44 @@
 						}
 					]
 				},
-				"method": "POST",
+				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "grant_type",
-							"value": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-							"description": "Always: urn:ietf:params:oauth:grant-type:jwt-bearer",
-							"type": "text"
-						},
-						{
-							"key": "client_id",
-							"value": "{{clientid}}",
-							"description": "Tesla client_id",
-							"type": "text"
-						},
-						{
-							"key": "client_secret",
-							"value": "{{clientsecret}}",
-							"description": "Tesla client_secret",
-							"type": "text"
-						}
-					],
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
 				"url": {
-					"raw": "{{endPoint}}oauth/token",
+					"raw": "{{endPoint}}api/1/vehicles",
 					"host": [
-						"{{endPoint}}oauth"
+						"{{endPoint}}api"
 					],
 					"path": [
-						"token"
+						"1",
+						"vehicles"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Refresh Token",
+			"name": "Get Drive State",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"var jsonData = pm.response.json();\r",
-							"//extract bearer and refresh tokens\r",
-							"// bearer token: for use in API calls such as Wake Vehicle and Get Vehicle Data; valid for 45 days\r",
-							"// refresh token: refresh bearer token after 45 days\r",
-							"pm.environment.set(\"teslaBearerToken\", jsonData.access_token);\r",
-							"pm.environment.set(\"teslaRefreshToken\", jsonData.refresh_token);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "grant_type",
-							"value": "refresh_token",
-							"type": "text"
-						},
-						{
-							"key": "client_id",
-							"value": "ownerapi",
-							"type": "text"
-						},
-						{
-							"key": "refresh_token",
-							"value": "{{refresh_token}}",
-							"type": "text"
-						},
-						{
-							"key": "scope",
-							"value": "openid email offline_access",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{tokenEndPoint}}token",
-					"host": [
-						"{{tokenEndPoint}}token"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Access Token with MFA",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"//extract bearer and refresh tokens\r",
-							"// bearer token: for use in API calls such as Wake Vehicle and Get Vehicle Data; valid for 45 days\r",
-							"// refresh token: this is useless with the current OAuth implementation\r",
+							"var isValid = true;\r",
+							"var todaysDate = new Date();\r",
 							"\r",
-							"if(responseCode.code == 200)\r",
-							"{\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.environment.set(\"teslaBearerToken\", jsonData.access_token);\r",
-							"    pm.environment.set(\"teslaRefreshToken\", jsonData.refresh_token);\r",
-							"}"
+							"pm.test(\"Valid Token Check\", function () {\r",
+							"        if (todaysDate.getTime() > pm.environment.get(\"tokenValidUntil\")) {\r",
+							"            console.log(\"Token has expired.\");\r",
+							"            isValid = false;\r",
+							"        }\r",
+							"        else {\r",
+							"            console.log(\"Token valid until: \" + pm.environment.get(\"readableValidUntilDate\"));\r",
+							"        }\r",
+							"        pm.expect(isValid).to.eql(true);\r",
+							"    });\r",
+							"\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -629,70 +341,146 @@
 			],
 			"request": {
 				"auth": {
-					"type": "oauth2",
-					"oauth2": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "addTokenTo",
-							"value": "header",
-							"type": "string"
-						},
-						{
-							"key": "state",
-							"value": "EnterRandomCharactersHere",
-							"type": "string"
-						},
-						{
-							"key": "clientId",
-							"value": "ownerapi",
-							"type": "string"
-						},
-						{
-							"key": "accessTokenUrl",
-							"value": "https://auth.tesla.com/oauth2/v3/token",
-							"type": "string"
-						},
-						{
-							"key": "authUrl",
-							"value": "https://auth.tesla.com/oauth2/v3/authorize",
-							"type": "string"
-						},
-						{
-							"key": "tokenName",
-							"value": "Tesla Owners API Token",
-							"type": "string"
-						},
-						{
-							"key": "scope",
-							"value": "openid email offline_access",
-							"type": "string"
-						},
-						{
-							"key": "redirect_uri",
-							"value": "https://auth.tesla.com/void/callback",
-							"type": "string"
-						},
-						{
-							"key": "grant_type",
-							"value": "authorization_code_with_pkce",
-							"type": "string"
-						},
-						{
-							"key": "client_authentication",
-							"value": "header",
-							"type": "string"
-						},
-						{
-							"key": "tokenType",
-							"value": "Bearer",
+							"key": "token",
+							"value": "{{access_token}}",
 							"type": "string"
 						}
 					]
 				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{endPoint}}/api/1/vehicles/{{teslaVehicleIdS}}/data_request/drive_state",
+					"host": [
+						"{{endPoint}}"
+					],
+					"path": [
+						"api",
+						"1",
+						"vehicles",
+						"{{teslaVehicleIdS}}",
+						"data_request",
+						"drive_state"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Charge State",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var isValid = true;\r",
+							"var todaysDate = new Date();\r",
+							"\r",
+							"pm.test(\"Valid Token Check\", function () {\r",
+							"        if (todaysDate.getTime() > pm.environment.get(\"tokenValidUntil\")) {\r",
+							"            console.log(\"Token has expired.\");\r",
+							"            isValid = false;\r",
+							"        }\r",
+							"        else {\r",
+							"            console.log(\"Token valid until: \" + pm.environment.get(\"readableValidUntilDate\"));\r",
+							"        }\r",
+							"        pm.expect(isValid).to.eql(true);\r",
+							"    });\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{endPoint}}api/1/vehicles/{{teslaVehicleIdS}}/data_request/charge_state",
+					"host": [
+						"{{endPoint}}api"
+					],
+					"path": [
+						"1",
+						"vehicles",
+						"{{teslaVehicleIdS}}",
+						"data_request",
+						"charge_state"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Tesla Access Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var MonthAbbr = [\"Jan\",\"Feb\",\"Mar\",\"Apr\",\"May\",\"Jun\",\"Jul\",\"Aug\",\"Sept\",\"Oct\",\"Nov\",\"Dec\"];\r",
+							"const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"var c_s;\r",
+							"\r",
+							"function generateString(length) {\r",
+							"    let result = '';\r",
+							"    const charactersLength = characters.length;\r",
+							"    for ( let i = 0; i < length; i++ ) {\r",
+							"        result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
+							"    }\r",
+							"\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"var todaysDate = new Date();\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"access_token\",jsonData.access_token);\r",
+							"\r",
+							"var expiresIn = jsonData.expires_in;\r",
+							"var tokenValidUntil = todaysDate.setTime(todaysDate.getTime() + (expiresIn * 1000));\r",
+							"pm.environment.set(\"tokenValidUntil\",tokenValidUntil);\r",
+							"\r",
+							"var validUntilDate = new Date(tokenValidUntil);\r",
+							"var readableValidUntilDate = validUntilDate.getDate().toString().padStart(2,\"0\") + \r",
+							"\" \" + MonthAbbr[validUntilDate.getMonth()] + \r",
+							"\" \" + validUntilDate.getFullYear() + \r",
+							"\" \" + validUntilDate.getHours().toString().padStart(2,\"0\") + \r",
+							"\":\" + validUntilDate.getMinutes().toString().padStart(2,\"0\") + \r",
+							"\":\" + validUntilDate.getSeconds().toString().padStart(2,\"0\");\r",
+							"pm.environment.set(\"readableValidUntilDate\",readableValidUntilDate);\r",
+							"\r",
+							"console.log (\"valid until: \" + readableValidUntilDate);\r",
+							"\r",
+							"//update requestState\r",
+							"c_s = generateString(16);\r",
+							"pm.environment.set(\"requestState\",c_s);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"grant_type\": \"urn:ietf:params:oauth:grant-type:jwt-bearer\",\r\n    \"client_id\": \"{{clientid}}\",\r\n    \"client_secret\": \"{{clientsecret}}\"\r\n}",
+					"raw": "{\r\n  \"grant_type\": \"refresh_token\",\r\n  \"refresh_token\": \"{{refresh_token}}\",\r\n  \"client_id\": \"ownerapi\",\r\n  \"client_secret\": \"{{client_secret}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -700,16 +488,9 @@
 					}
 				},
 				"url": {
-					"raw": "https://owner-api.teslamotors.com/oauth/token",
-					"protocol": "https",
+					"raw": "{{tokenEndPoint}}token",
 					"host": [
-						"owner-api",
-						"teslamotors",
-						"com"
-					],
-					"path": [
-						"oauth",
-						"token"
+						"{{tokenEndPoint}}token"
 					]
 				}
 			},
