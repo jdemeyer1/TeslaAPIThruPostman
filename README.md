@@ -1,10 +1,12 @@
-# Using the Tesla API with Postman
+# Using the Tesla API with Desktop Verion of Postman
 
 **PLEASE READ STEPS DOCUMENTATION BEFORE ATTEMPTING AUTHENTICATION.**  Familarity with [Postman](https://www.postman.com/) is recommended. Postman has encapsulated the OAuth 2.0 sequence reducing the number of steps from the previous release of this collection.
 
 It is not necessary to store your credentials in Postman.  Postman presents the Tesla authentication web page from Tesla's website in an embedded browser to generate the access token.
 
 Thanks to Eric Schnabel for the first update that included this method, thanks to Postman for this [reference](https://documenter.getpostman.com/view/5857899/TW74k5k4), and thanks to tesla-info for this [reference](https://tesla-info.com/tesla-token.php)!
+
+**Note: This collection does not function as described on the web version of Postman.**
 
 ### Step 1: Request Tesla Access Token
 
