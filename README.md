@@ -1,4 +1,4 @@
-# Using the Tesla API with Desktop Verion of Postman
+# Using the Tesla API with Desktop Version of Postman
 
 **PLEASE READ STEPS DOCUMENTATION BEFORE ATTEMPTING AUTHENTICATION.**  Familarity with [Postman](https://www.postman.com/) is recommended. Postman has encapsulated the OAuth 2.0 sequence reducing the number of steps from the previous release of this collection.
 
