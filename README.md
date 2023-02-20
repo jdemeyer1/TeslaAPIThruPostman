@@ -10,9 +10,10 @@ Thanks to Eric Schnabel for the first update that included this method, thanks t
 
 ### Step 1: Request Tesla Access Token
 
-USER PREPARATION: Enter the client secret in the environment. Variable is already defined under the imported environment of Postman.
-Update the valiable "clientsecret". The current client secret is [available here](https://pastebin.com/pS7Z6yyP). 
-The client ID is not needed.  Save these changes before requesting a token.
+USER PREPARATION: Enter the client secret in the environment. 
+This Variable is already defined in the imported "Tesla environment" of Postman.
+Update the defined "clientsecret" variable which is [available here](https://pastebin.com/pS7Z6yyP). 
+The client ID is not needed.  Save these changes before hitting the button to request a token.
 
 #### Documentation
 
